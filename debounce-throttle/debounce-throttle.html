@@ -1,0 +1,70 @@
+<script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
+
+<div id="app">
+  <input v-model.lazy.trim="interval" :placeholder="interval"/>
+  <p>Set Interval {{ interval }}</p>
+  <h2>Debounce</h2>
+  <button @click="debounceClick">click me</button>
+  <p>{{ counter }}</p>
+  <h2>Throttle</h2>
+  <button @click="throttleClick">click me</button>
+  <p>{{ counter }}</p>
+</div>
+
+<script>
+// debounce and throttle both finish until the interval ends,
+// debounce trigger the counter update finally, throttle does it 
+// during the interval time 
+function debounce (fn, interval) {
+  let timeout
+  return function () {
+    // context and args for the lazy exectuted funtion 
+    const context = this, args = arguments
+    const start = Date.now()
+    const finalExecute = function () {
+      console.log(`Finish the click spend ${(Date.now() - start)}ms`)
+      timeout = null
+      fn.apply(context, args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(finalExecute, interval || 1000)
+  }
+}
+
+function throttle (fn, interval) {
+  let timeout
+  return function () {
+    const context = this, args = arguments
+    const start = Date.now()
+    const finalExecute = function () {
+      console.log(`Finish the click spend ${(Date.now() - start)}ms`)
+      timeout = false
+    }
+    if (!timeout) {
+      fn.apply(context, args)
+      timeout = true
+      setTimeout(finalExecute, interval)
+    }
+  }
+}
+
+new Vue({
+  el: '#app',
+  data: {
+    counter: 0,
+    interval: 1000,
+  },
+  methods: {
+    handleClick () {
+      ++this.counter
+    },
+    debounceClick () {
+      debounce(this.handleClick, this.interval)()
+    },
+    throttleClick () {
+      throttle(this.handleClick, this.interval)()
+    }
+  },
+})
+
+</script>
