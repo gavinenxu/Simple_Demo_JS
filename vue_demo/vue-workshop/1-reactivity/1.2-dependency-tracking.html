@@ -1,0 +1,35 @@
+<script>
+// a class representing a dependency
+// exposing it on window is necessary for testing
+window.Dep = class Dep {
+  // Implement this!
+  constructor () {
+    this.subscribers = new Set()
+  }
+
+  depend () {
+    if (activeUpdate) {
+      this.subscribers.add(activeUpdate)  // register current active update as the subscriber
+    }
+  }
+
+  notify () {
+    this.subscribers.forEach(sub => sub())  // run all subscriber functions
+  }
+}
+
+let activeUpdate = null
+
+function autorun (update) {
+  // Implement this!
+  const wrappedUpdate = () => {
+    // register this wappedUpdate as the activeUpdate, keep collecting dependencies, dynamically rebalance dep, make the list of dep always uptodate
+    activeUpdate = wrappedUpdate   
+    
+    // whether we are inside the update funcntions
+    update()
+    activeUpdate = null
+  }
+  wrappedUpdate()
+}
+</script>
