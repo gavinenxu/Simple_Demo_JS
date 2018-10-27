@@ -1,0 +1,31 @@
+<script src="../node_modules/vue/dist/vue.js"></script>
+
+<div id="app">
+  <example :tags="['h1', 'h2', 'h3']"></example>
+</div>
+
+<script>
+// Vue.component('example', {
+//   // Implement this!
+//   props: ['tags'],
+//   render (h) {
+//     const children = this.tags.map((tag, i) => h(tag, i))
+//     return h('div', children)
+//   },
+// })
+
+Vue.component('example', {
+  functional: true,
+  props: ['tags'],
+  render (h, context) {
+    const children = context.props.tags.map((tag, i) => h(tag, i))
+    return h('div', children)
+  }
+})
+
+// const example = (h, {props: {tags}}) => {
+//   return h('div', tags.map((tag, i) => h(tag, i)))
+// }
+
+new Vue({ el: '#app' })
+</script>

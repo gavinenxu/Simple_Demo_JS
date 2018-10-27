@@ -1,0 +1,102 @@
+<script src="../node_modules/vue/dist/vue.js"></script>
+<script src="./path-to-regexp.js"></script>
+
+<div id="app"></div>
+
+<script>
+'/user/:username'
+'/user/123?foo=bar'
+
+const parse = 
+{
+  path: '/user/123',
+  params: {username: '123'},
+  query: {foo: 'bar'}
+}
+// '#/foo/123' -> foo with id: 123
+// '#/bar' -> Bar
+// '#/404' -> NotFound
+
+// path-to-regexp usage:
+// const regex = pathToRegexp(pattern)
+// const match = regex.exec(path)
+// const params = regex.keys.reduce((params, key, index) => {
+//   params[key] = match[index + 1]
+// }, {})
+
+const Foo = {
+  props: ['id'],
+  template: `<div>foo with id: {{ id }}</div>`
+}
+const Bar = {
+  props: ['id'],
+  template: `<div>bar with id: {{ id }}</div>`
+}
+// const Bar = { template: `<div>bar</div>` }
+const NotFound = { template: `<div>not found!</div>` }
+
+// public api
+const routeTable = {
+  // Implement this!
+  '/foo/:id': Foo,
+  '/bar/:id': Bar,
+}
+
+// pre-compile patterns into regex
+const compiledRouteTabel = {}
+Object.keys(routeTable).forEach(pattern => {
+  const dynamicSegments = []
+  compiledRouteTabel[pattern] = {
+    component: routeTable[pattern],
+    regex: pathToRegexp(pattern, dynamicSegments),
+    dynamicSegments  // -> store props
+  }
+})
+// precompile /bar/:id: {component: {…}, regex: /^\/bar\/((?:[^\/]+?))(?:\/(?=$))?$/i, dynamicSegments: Array(1)}
+
+window.addEventListener('hashchange', () => {
+  // Implement this!
+  app.url = window.location.hash.slice(1)
+})
+
+const app = new Vue({
+  el: '#app',
+  data: {
+    url: window.location.hash.slice(1)
+  },
+  render (h) {
+    const path = '/' + this.url
+
+    let componentToRender
+    let props = {}
+
+    // Implement the logic to figure out proper values
+    // for componentToRender and props
+    Object.keys(compiledRouteTabel).some(route => {
+      const { component, regex, dynamicSegments } = compiledRouteTabel[route]
+      const match = regex.exec(path)     // use regex to match path
+      if (match) {
+        componentToRender = component   // set components
+
+        console.log(match)
+        // set props
+        dynamicSegments.forEach(({name}, index) => {
+          props[name] = match[index+1]  
+        })
+        return true
+      }
+    })
+
+
+
+    return h('div', [
+      h(componentToRender || NotFound, { props }),
+      h('a', { attrs: { href: '#foo/123' }}, 'foo123'),
+      ' | ',
+      h('a', { attrs: { href: '#foo/234' }}, 'foo234'),
+      ' | ',
+      h('a', { attrs: { href: '#bar/555' }}, 'bar555')
+    ])
+  }
+})
+</script>
