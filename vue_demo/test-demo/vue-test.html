@@ -1,0 +1,64 @@
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+
+<div id="app">
+  <h2>v-model</h2>
+  <input 
+        placeholder="no v-model"
+        :value="inputWords"
+        @input="inputWords = $event.target.value"
+  />
+  <div>No v-model: {{ inputWords | capitalize }}</div>
+
+  <input v-model="inputWords" placeholder="say something"/>
+  <div>parent v-model: {{ inputWords | reverse | capitalize }} </div>
+
+  <child-component v-model="inputWords">
+      <div>Child v-model: {{ inputWords }}</div>
+  </child-component>
+
+  <h2>custom-directives</h2>
+  <input disabled="true" placeholder="normal disable"/>
+  <button v-disable="disabled">Directive Disabled by setting tag attr</button>
+</div>
+
+<script>
+const childComponent = 
+Vue.component('child-component',{
+  props: ['value'],
+  template: `
+    <div>
+      <input
+        placeholder="child comp"
+        :value="value"
+        @input="$emit('input', $event.target.value)"
+      />
+      <slot></slot>
+    </div>
+  `
+})
+
+Vue.filter('capitalize', function (value) {
+  if (!value) return ''
+  return value[0].toUpperCase() + value.slice(1)
+})
+
+Vue.directive('disable', {
+  bind: function (el, binding) {
+    el.disabled = !!binding.value
+  }
+})
+
+const vm = new Vue({
+  el: '#app',
+  data: {
+    inputWords: '',
+    disabled: true
+  },
+  filters: {
+    reverse (value) {
+      if (!value) return ''
+      return value.split('').reverse().join('')
+    }
+  }
+})
+</script>
