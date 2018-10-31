@@ -1,0 +1,80 @@
+<script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+
+<ul id="app"> 
+  <folder :tree="tree"></folder>
+</ul>
+
+<script type="text/x-template" id="folderTmpl">
+  <li id="folder-template">
+    <div
+      :class="{bold: isFolder}"
+      @click="toggle"
+    >{{ tree.name }}<span v-if="isFolder">{{ open ? '[-]' : '[+]' }}</span>
+    </div>
+    <ul v-show="open">
+      <folder 
+        v-for="(node, i) in tree.children"
+        :tree=node
+        :key=i
+      ></folder>
+    </ul>
+  </li>
+</script>
+
+<script>
+var tree = {
+  name: 'Vue',
+  children: [
+    {name: 'vue-router'},
+    {name: 'vuex'},
+    {name: 'vue-cli'},
+    { name: 'vue-basics',
+      children: [
+      {name: 'vue-dictectives'},
+      { name: 'vue-workflow',
+        children: [
+        {name: 'vue-lifecycle'},
+        {name: 'vue-navigation-guard'}
+      ]}
+    ]}
+  ]
+}
+
+
+Vue.component('folder', {
+  props: {
+    tree: Object
+  },
+  data () {
+    return {
+      open: false
+    }
+  },
+  template: folderTmpl,
+  computed: {
+    isFolder () {
+      return this.tree.children && this.tree.children.length
+    }
+  },
+  methods: {
+    toggle () {
+      this.open = !this.open
+    }
+  }
+  
+})
+
+const vm = new Vue({
+  el: "#app",
+  data: {
+    tree
+  }
+})
+</script>
+
+<style>
+.bold {
+  font-weight: bold;
+  font-size: 25px;
+}
+</style>
