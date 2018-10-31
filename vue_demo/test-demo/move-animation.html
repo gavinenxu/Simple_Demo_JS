@@ -1,0 +1,114 @@
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/lodash/4.3.0/lodash.min.js"></script>
+
+<div id="app">
+
+  <button @click="insert">insert</button>
+  <button @click="insertRandom">random</button>
+  <button @click="reset">reset</button>
+  <button @click="shuffle">shuffle</button>
+
+  <!-- render span with no tag -->
+  <transition-group tag="ul" name="fade">  
+    <item v-for="item in items"
+          :key=item
+          :id=item
+    >
+      <button @click="close(item)">x</button>
+    </item>
+  </transition-group>
+</div>
+
+<script>
+
+var list = [1,2,3,4,5]
+
+Vue.component('item', {
+  props: ['id'],
+  template: `
+    <div class="item">
+      {{ id }}
+      <slot></slot>
+    </div>
+  `
+})
+
+
+const vm = new Vue({
+  el: "#app",
+  data: {
+    items: list
+  },
+  methods: {
+    insert () {
+      this.items.push(getNewNum(this.items))
+    },
+    insertRandom () {
+      var index = getRandomIndex(this.items)
+      this.items.splice(index, 0, getNewNum(this.items))
+    },
+    reset () {
+      this.items = [1,2,3,4,5]
+    },
+    shuffle () {
+      this.items = _.shuffle(this.items)
+    },
+    close (item) {
+      this.items.splice(this.items.indexOf(item), 1)
+    }
+  }
+})
+
+function getRandomIndex (list) {
+  if (list.length === 0) return 0
+  return ~~(Math.random() * list.length)
+}
+
+
+function getNewNum (list) {
+  if (list.length === 0) return 1
+  return Math.max(...list) + 1
+}
+</script>
+
+<style>
+button {
+  display: inline-block;
+  width: 80px;
+  margin: 0 10px;
+}
+
+.item {
+  background: #dddddd;
+  width: 400px;
+  height: 40px;
+  margin: 10px;
+  padding-top: 10px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.item > button {
+  float: right;
+  margin-right: 50px;
+  background: #fff;
+  font-size: 20px;
+}
+
+/* 1. declare transition,  v-move transition move for list  */
+.fade-move, .fade-enter-active, .fade-leave-active {
+  transition: all 1s cubic-bezier(.55, 0, .1, 1)   /* time change function */
+}
+
+/* 2. declare enter from and leave to state */
+.fade-enter, .fade-leave-to {
+  opacity: 0;                             /* state change */
+  transform: translate(30px, 0)
+}
+
+/* 3. ensure leaving items are taken out of layout flow so that moving
+animations can be calculated correctly.  using for close */  
+.fade-leave-active {
+  position: absolute;     /* position change */
+}
+</style>
