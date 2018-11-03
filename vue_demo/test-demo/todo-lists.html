@@ -1,0 +1,111 @@
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+
+<section id="app">
+  <section class="header">
+    <h1>todo list</h1>
+    <input class="new-todo"
+          v-model="newTodo"
+          @keyup.enter="addTodo"
+    />
+  </section>
+  <section class="main">
+    <ul class="todo-list">
+      <li v-for="todo in todos"
+          :key=todo.id
+      >
+        <div class="view">
+          <label @dblclick="showedit(todo)">{{ todo.title }}</label>
+          <!-- <input v-model="edit" /> -->
+          <button @click="remove(todo)">remove</button>
+        </div>
+        <input type="text"
+          v-show="showEdit"
+          v-model.lazy="todo.title"
+          @keyup.enter="doneEdit(todo)"
+          @keyup.esc="cancelEdit"
+        />
+      </li>
+    </ul>
+  </section>
+</section>
+
+<script>
+
+const STORAGE_KEY = 'todo-list'
+var todoStorage = {
+  fetch: function () {
+    var todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+
+    // todos.forEach((todo, index) => {
+    //   todo.id = index
+    // });
+    todoStorage.uid = todos.length
+    return todos
+  },
+  save: function (todos) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
+  }
+}
+
+var visibility = {
+  active: {
+
+  },
+  completed: {
+
+  }
+}
+
+const vm = new Vue({
+  el: "#app",
+  data: {
+    todos: todoStorage.fetch(),
+    newTodo: '',
+    showEdit: false,
+    editTodo: null,
+  },
+  watch: {
+    todos: {
+      handler: function (todos) {
+        todoStorage.save(todos)
+      },
+      deep: true
+    }
+  },
+  computed: {
+    filteredTodos () {
+      return 
+    }
+  },
+  methods: {
+    addTodo () {
+      const value = this.newTodo && this.newTodo.trim()
+      if (!value) return 
+
+      this.todos.push({
+        id: todoStorage.uid++,
+        title: value,
+        completed: false
+      })
+      this.newTodo = ''
+    },
+    showedit (todo) {
+      this.editTodo = todo
+      this.showEdit = !this.showEdit
+    },
+    doneEdit (todo) {
+      this.showEdit = false
+    },
+    cancelEdit () {
+      this.showEdit = false
+    },
+    remove (todo) {
+      this.todos.splice(this.todos.indexOf(todo.id), 1)
+    }
+  }
+})
+</script>
+
+<style>
+
+</style>
