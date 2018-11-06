@@ -4,9 +4,14 @@
 <div id="app">
   <div>state count: {{ count }}</div>
   <div>total count: {{ totalCount }}</div>
-  <button @click="increment">+</button>
-  <button @click="decrement">-</button>
+  <button @click="incr">+</button>
+  <button @click="decr">-</button>
   <div>{{ other }}</div>
+  <hr/>
+  <input v-model.lazy.number="counterPayload" placeholder="payload number"/>
+  <div>{{ count }}</div>
+  <button @click="incrPayload">+ {{ counterPayload }}</button>
+  <button @click="decrPayload">- {{ counterPayload }}</button>
 </div>
 
 <script>
@@ -16,11 +21,11 @@ const store = new Vuex.Store({
     count: 0
   },
   mutations: {
-    increment (state) {
-      state.count++
+    increment (state, payload = 1) {
+      state.count += payload
     },
-    decrement (state) {
-      state.count--
+    decrement (state, payload = 1) {
+      state.count -= payload
     }
   }
 })
@@ -29,7 +34,8 @@ const vm = new Vue({
   el: '#app',
   store,           // inject into child component, so it will not import singleton store in every child component
   data: {
-    localCount: 1
+    localCount: 1,
+    counterPayload: 0
   },
   computed: {
     // count () {
@@ -48,12 +54,31 @@ const vm = new Vue({
     })
   },
   methods: {
-    increment () {
-      store.commit('increment')
+    // increment () {
+    //   this.$store.commit('increment')
+    // },
+    // decrement () {
+    //   this.$store.commit('decrement')
+    // },
+    ...Vuex.mapMutations([
+      'increment',
+      'decrement',
+    ]),
+
+    incr () {
+      this.increment()
     },
-    decrement () {
-      store.commit('decrement')
+    decr () {
+      this.decrement()
+    },
+    incrPayload () {
+      // this.$store.commit('incrPayload', this.counterPayload)
+      this.increment(this.counterPayload)
+    },
+    decrPayload () {
+      this.decrement(this.counterPayload)
     },
   }
 })
+
 </script>

@@ -28,10 +28,9 @@ const store = new Vuex.Store({
     doneTodo: state => state.todo.filter(el => el.done),
     doneTodoLength: (state, getters) => getters.doneTodo.length,
     getTodoById: state => id => state.todo.find(el => el.id == id) || 'not found'  // implicit coercion use ==
-    // getters could also pass function to it, like methods in Vue, but it will be cached
+    // getters could also pass function to it, like methods in Vue, but it will not be cached
   }
 })
-
 
 const vm = new Vue({
   el: '#app',
@@ -52,5 +51,4 @@ const vm = new Vue({
     }
   }
 })
-
 </script>

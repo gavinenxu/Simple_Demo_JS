@@ -1,0 +1,80 @@
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+
+<div id="app">
+  <div>foo obj: {{ foo }}</div>
+  <button @click="notUpdateFoo">not update</button>
+  <button @click="updateFoo">update</button>
+
+  <ul v-for="(v,index) in bar"
+    :key=index
+  >
+    <li>{{ v }}</li> 
+  </ul>
+  <div>bar length: {{ bar.length }}</div> 
+  <button @click="notUpdateBar">not update</button>
+  <button @click="updateBar">update</button>
+
+  <hr/>
+  <messege></message>
+  
+</div>
+
+<script>
+
+Vue.component('messege', {
+  data() {
+    return {
+      msg: 'initial'
+    }
+  },
+  template:`
+    <div>
+      <div>{{ msg }}</div>
+    </div>
+  `,
+  mounted() {
+    // Defer the callback to be executed after the next DOM update cycle. 
+    // Use it immediately after you’ve changed some data to wait for the DOM update.
+    this.$nextTick(function () {
+      this.msg = 'updated before dom render'
+    })
+    this.msg = 'not rendered' 
+  },
+})
+
+const vm = new Vue({
+  el: '#app',
+  data: {
+    foo: {
+      quantify: 10,
+      category: 'food'
+    },
+    bar: [
+      'vue',
+      'vuex',
+      'vue-router'
+    ]
+  },
+  methods: {
+    notUpdateFoo () {
+      this.foo.price = 1
+      console.log(this.foo)
+    },
+    updateFoo () {
+      // this.$set(this.foo, 'price', 1)
+      this.foo = {...this.foo, price: 1}
+      console.log(this.foo)
+    },
+    notUpdateBar () {
+      this.bar[this.bar.length] = 'vue-template'
+      console.log(this.bar)
+    },
+    updateBar () {
+      // this.$set(this.bar, this.bar.length, 'vue-template')
+      // this.bar = [...this.bar, 'vue-template']
+      this.bar.push('vue-template')
+      console.log(this.bar)
+    }
+  }
+})
+</script>
