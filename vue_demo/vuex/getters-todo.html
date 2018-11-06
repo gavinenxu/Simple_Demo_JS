@@ -1,0 +1,56 @@
+<script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js"></script>
+
+<div id="app">
+  <div>done todo length: {{ doneTodoLength }}</div>
+  <ul v-for="todo in doneTodo"
+      :key=todo.id
+  >
+    <li>{{ todo.text }} </li>
+  </ul>
+  <input v-model.lazy="searchId" placeholder="search by Id"/>{{ getTodoById }}
+</div>
+
+
+<script>
+
+const store = new Vuex.Store({
+  state: {
+    todo: [
+      {id: 1, text: 'vuex', done: false},
+      {id: 2, text: 'vue-router', done: false},
+      {id: 3, text: 'vue-basic', done: true},
+      {id: 4, text: 'vue-cli', done: true},
+      {id: 5, text: 'vue-template', done: true},
+    ]
+  },
+  getters: {      // it's like computed in vuex
+    doneTodo: state => state.todo.filter(el => el.done),
+    doneTodoLength: (state, getters) => getters.doneTodo.length,
+    getTodoById: state => id => state.todo.find(el => el.id == id) || 'not found'  // implicit coercion use ==
+    // getters could also pass function to it, like methods in Vue, but it will be cached
+  }
+})
+
+
+const vm = new Vue({
+  el: '#app',
+  store,
+  data: {
+    searchId: 1
+  },
+  computed: {
+    // ...Vuex.mapState({
+    //   todoList: state => state.todo.filter(el => el.done)
+    // }),
+    ...Vuex.mapGetters({
+      doneTodo: 'doneTodo',            // use quote to represent the viriable
+      doneTodoLength: 'doneTodoLength',
+    }),
+    getTodoById () {
+      return this.$store.getters.getTodoById(this.searchId)
+    }
+  }
+})
+
+</script>
