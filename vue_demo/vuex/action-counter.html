@@ -1,0 +1,80 @@
+<script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js"></script>
+
+<div id="app">
+  <input v-model.lazy.number="payload" placeholder="set count number"/>{{ payload }}
+  <h4>{{ count }}</h4>
+  <button @click="incr(payload)">+</button>
+  <button @click="decr(payload)">-</button>
+  <button @click="handleSeq(payload)">do sequence</button>
+</div>
+
+<script>
+
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state, payload = 1) {
+      state.count += payload
+    },
+    decrement (state, payload = 1) {
+      state.count -= payload
+    }
+  },
+  actions: {
+    incrementAsyc ({ commit, state }, payload) {
+      console.log(arguments)
+      return new Promise((resolve, reject) => {
+        setTimeout(function () {
+          commit('increment', payload)
+          resolve()
+        }, 2000)
+      })
+    },
+    decrementAsyc ({ commit, state }, payload) {
+      return new Promise((resolve, reject) => {
+        setTimeout(function () {
+          commit('decrement', payload)
+          resolve()
+        }, 1000)
+      })
+    },
+    promiseChain ({ dispatch }, payload) {
+      dispatch('incrementAsyc', payload)
+        .then(() => dispatch('decrementAsyc', payload))
+        .then(() => { console.log('All Done') })
+    }
+  }
+})
+
+const vm = new Vue({
+  el: '#app',
+  store,
+  data: {
+    payload: 1
+  },
+  computed: {
+    ...Vuex.mapState({
+      count: state => state.count
+    })
+  },
+  methods: {
+    ...Vuex.mapActions({
+      increment: 'incrementAsyc',
+      decrement: 'decrementAsyc',
+      sequence: 'promiseChain'
+    }),
+    incr (payload) {
+      this.increment(payload)
+    },
+    decr (payload) {
+      this.decrement(payload)
+    },
+    handleSeq (payload) {
+      this.sequence(payload)
+    }
+  }
+})
+</script>

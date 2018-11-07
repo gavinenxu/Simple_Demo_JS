@@ -10,8 +10,8 @@
   <hr/>
   <input v-model.lazy.number="counterPayload" placeholder="payload number"/>
   <div>{{ count }}</div>
-  <button @click="incrPayload">+ {{ counterPayload }}</button>
-  <button @click="decrPayload">- {{ counterPayload }}</button>
+  <button @click="incrBy(counterPayload)">+ {{ counterPayload }}</button>
+  <button @click="decrBy(counterPayload)">- {{ counterPayload }}</button>
 </div>
 
 <script>
@@ -71,11 +71,11 @@ const vm = new Vue({
     decr () {
       this.decrement()
     },
-    incrPayload () {
+    incrBy (payload) {
       // this.$store.commit('incrPayload', this.counterPayload)
-      this.increment(this.counterPayload)
+      this.increment(payload)
     },
-    decrPayload () {
+    decrBy () {
       this.decrement(this.counterPayload)
     },
   }
